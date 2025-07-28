@@ -1,17 +1,28 @@
 // functions/middleware.js
-
 export async function onRequest(context) {
-  // 1) Let Pages serve the asset first (your JSON)
-  const res = await context.next();
+  if (context.request.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders(context.request) });
+  }
 
-  // 2) If it's one of our translation files, tack on full CORS
-  if (context.request.url.match(/\/[a-z]{2}(-[A-Z]{2})?\.json$/)) {
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    res.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-    res.headers.set("Access-Control-Allow-Headers", "*");
-    // ← the critical header for credentialed requests:
-    res.headers.set("Access-Control-Allow-Credentials", "true");
+  const res = await context.next();
+  const { pathname } = new URL(context.request.url);
+
+  if (/^\/[a-z]{2}(-[A-Z]{2})?\.json$/.test(pathname)) {
+    const h = new Headers(res.headers);
+    Object.entries(corsHeaders(context.request)).forEach(([k, v]) => h.set(k, v));
+    return new Response(res.body, { status: res.status, headers: h });
   }
 
   return res;
+}
+
+function corsHeaders(req) {
+  const origin = req.headers.get('origin') || '';
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
+    'Vary': 'Origin'
+  };
 }
