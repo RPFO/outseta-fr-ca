@@ -1,6 +1,0 @@
-/fr-ca.json
-  Access-Control-Allow-Origin: https://rpfo.webflow.io
-  Access-Control-Allow-Methods: GET, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
-  Access-Control-Allow-Credentials: true
-  Vary: Origin
