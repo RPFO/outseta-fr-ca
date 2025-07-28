@@ -1,35 +1,44 @@
 // /functions/middleware.js
 export async function onRequest(context) {
-  // Preflight
-  if (context.request.method === 'OPTIONS') {
-    return new Response(null, { headers: cors(context.request) });
+  const req = context.request;
+  const url = new URL(req.url);
+
+  // 1) Handle preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders(req) });
   }
 
+  // 2) Let Pages serve the file
   const res = await context.next();
-  const { pathname } = new URL(context.request.url);
 
-  if (/^\/[a-z]{2}(-[A-Z]{2})?\.json$/.test(pathname)) {
-    const h = new Headers(res.headers);
-    Object.entries(cors(context.request)).forEach(([k, v]) => h.set(k, v));
-    return new Response(res.body, { status: res.status, headers: h });
+  // 3) Only add CORS for our locale JSON files
+  if (/^\/[a-z]{2}(-[A-Z]{2})?\.json$/.test(url.pathname)) {
+    const headers = new Headers(res.headers);
+    const extra = corsHeaders(req);
+    for (const [k, v] of Object.entries(extra)) headers.set(k, v);
+    return new Response(res.body, { status: res.status, headers });
   }
+
   return res;
 }
 
-function cors(req) {
+function corsHeaders(req) {
   const origin = req.headers.get('origin') || '';
-  const allow = [
+  const allowList = [
     'https://rpfo.webflow.io',
     'https://www.rpfo.ca',
-    'https://go.outseta.com',
-    'https://app.outseta.com'
   ];
-  const allowedOrigin = allow.includes(origin) ? origin : allow[0];
+  const allowedOrigin = allowList.includes(origin) ? origin : allowList[0];
+
+  // Browser tells us what headers it wants in Access-Control-Request-Headers
+  const reqHeaders = req.headers.get('access-control-request-headers') || 'Authorization, Content-Type';
+
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': reqHeaders,
     'Access-Control-Allow-Credentials': 'true',
-    'Vary': 'Origin'
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin, Access-Control-Request-Headers'
   };
 }
