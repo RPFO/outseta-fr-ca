@@ -26,6 +26,7 @@ function corsHeaders(req) {
   const origin = req.headers.get('origin') || '';
   const allowList = [
     'https://rpfo.webflow.io',
+    'https://rpfo.ca',
     'https://www.rpfo.ca',
   ];
   const allowedOrigin = allowList.includes(origin) ? origin : allowList[0];
