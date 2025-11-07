@@ -239,7 +239,7 @@
     "Paid": "Payé",
     "Partial": "Partiel",
     "Password": "Mot de passe",
-    "PasswordChange": "Changement de mot de passe",
+    "PasswordChange": "Changer le mot de passe",
     "PasswordChanged": "Mot de passe changé",
     "PasswordHistory": "Pas l'un de vos derniers mots de passe {{historysize}}",
     "PasswordMinimumLength": "Minimum {{minimumlength}} caractères",
