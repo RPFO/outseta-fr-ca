@@ -114,9 +114,7 @@
     "Change_Name": "Changer de nom",
     "Change_Organization": "Changer le nom ou l’organisation",
     "Change_Password": "Changer le mot de passe",
-    "FirstLastName": "Nom",
-    "Phone": "Téléphone",
-    "Change_Phone": "Changer le téléphone"
+    "FirstLastName": "Nom"
   },
   "Labels": {
     "Account": "Compte",
